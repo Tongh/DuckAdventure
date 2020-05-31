@@ -8,11 +8,16 @@ public class PlayerController : MonoBehaviour
     private Animator AnimatorComp;
     private Rigidbody2D Rigidbody2DComp;
     private bool bGameStart = false;
+    private bool bIsInAir = false;
+    private bool bIsJumpFall = false;
 
+    public Transform TriggerIsInAir;
+    public LayerMask GroundMask;
     public float MoveSpeed = .02f;
     public float JumpForce = 300;
     public float GravityNormal = 3.0f;
     public float GravityJump = 1.2f;
+    public float GroundDistance = .1f;
 
     private void Awake()
     {
@@ -31,6 +36,21 @@ public class PlayerController : MonoBehaviour
         if (bGameStart)
         {
             transform.Translate(new Vector2(MoveSpeed, .0f));
+
+            var RayHitResult = Physics2D.Raycast(TriggerIsInAir.position, Vector2.down, GroundDistance, GroundMask);
+            // Debug.DrawLine(TriggerIsInAir.position, TriggerIsInAir.position + Vector3.down * GroundDistance, Color.red);
+            if (RayHitResult)
+            {
+                bIsInAir = false;
+                bIsJumpFall = false;
+                // Debug.Log(RayHitResult.transform.name);
+            }
+            else
+            {
+                bIsInAir = true;
+            }
+            AnimatorComp.SetBool("bIsInAir", bIsInAir);
+            AnimatorComp.SetBool("bIsJumpFall", bIsJumpFall);
         }
     }
 
@@ -56,12 +76,16 @@ public class PlayerController : MonoBehaviour
 
     public void Jump()
     {
-        Rigidbody2DComp.gravityScale = GravityJump;
-        Rigidbody2DComp.AddForce(new Vector2(0, JumpForce));
+        if (!bIsInAir)
+        {
+            Rigidbody2DComp.gravityScale = GravityJump;
+            Rigidbody2DComp.AddForce(new Vector2(0, JumpForce));
+        }
     }
 
     public void JumpOff()
     {
         Rigidbody2DComp.gravityScale = GravityNormal;
+        bIsJumpFall = true;
     }
 }

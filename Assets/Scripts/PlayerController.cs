@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     private bool bGameStart = false;
     private bool bIsInAir = false;
     private bool bIsJumpFall = false;
+    private bool bIsSlide = false;
 
     public Transform TriggerIsInAir;
     public LayerMask GroundMask;
@@ -66,6 +67,16 @@ public class PlayerController : MonoBehaviour
         {
             JumpOff();
         }
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            WalkToSlide();
+        }
+
+        if (Input.GetKeyUp(KeyCode.W))
+        {
+            SlideToWalk();
+        }
     }
 
     public void Play()
@@ -87,5 +98,17 @@ public class PlayerController : MonoBehaviour
     {
         Rigidbody2DComp.gravityScale = GravityNormal;
         bIsJumpFall = true;
+    }
+
+    public void WalkToSlide()
+    {
+        bIsSlide = true;
+        AnimatorComp.SetBool("bIsSlide", bIsSlide);
+    }
+
+    public void SlideToWalk()
+    {
+        bIsSlide = false;
+        AnimatorComp.SetBool("bIsSlide", bIsSlide);
     }
 }

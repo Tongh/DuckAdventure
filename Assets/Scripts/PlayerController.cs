@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Timeline;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,18 +13,24 @@ public class PlayerController : MonoBehaviour
     private bool bIsJumpFall = false;
     private bool bIsSlide = false;
 
+    public GameObject SmokePoint;
+    public GameObject SmokeEffect;
     public Transform TriggerIsInAir;
     public LayerMask GroundMask;
+    public BoxCollider2D BoxColliderComp;
+    public CircleCollider2D CircleColliderComp;
     public float MoveSpeed = .02f;
     public float JumpForce = 300;
     public float GravityNormal = 3.0f;
     public float GravityJump = 1.2f;
-    public float GroundDistance = .1f;
+    public float GroundDistance = .15f;
 
     private void Awake()
     {
         AnimatorComp = GetComponent<Animator>();
         Rigidbody2DComp = GetComponent<Rigidbody2D>();
+
+        StartCoroutine(CreateSmoke());
     }
 
     // Start is called before the first frame update
@@ -104,11 +111,31 @@ public class PlayerController : MonoBehaviour
     {
         bIsSlide = true;
         AnimatorComp.SetBool("bIsSlide", bIsSlide);
+        
+        BoxColliderComp.enabled = false;
+        CircleColliderComp.enabled = true;
+
     }
 
     public void SlideToWalk()
     {
         bIsSlide = false;
         AnimatorComp.SetBool("bIsSlide", bIsSlide);
+        BoxColliderComp.enabled = true;
+        CircleColliderComp.enabled = false;
     }
+
+    IEnumerator CreateSmoke()
+    {
+        while (true)
+        {
+            if (!bIsInAir && bIsSlide)
+            {
+                Instantiate(SmokeEffect, SmokePoint.transform.position, Quaternion.identity);
+            }
+            
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+    
 }

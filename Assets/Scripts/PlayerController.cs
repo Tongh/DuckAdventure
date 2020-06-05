@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
 
     public GameObject SmokePoint;
     public GameObject SmokeEffect;
+    public GameObject StarHitEffect;
     public Transform TriggerIsInAir;
     public LayerMask GroundMask;
     public BoxCollider2D BoxColliderComp;
@@ -83,6 +84,19 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.W))
         {
             SlideToWalk();
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Star"))
+        {
+            GameManager.Instance.Score++;
+            GameManager.Instance.Stars += 10;
+            //Debug.Log("Hit Star");
+            Instantiate(StarHitEffect, gameObject.transform);
+            
+            Destroy(other.gameObject);
         }
     }
 

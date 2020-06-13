@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     private Animator AnimatorComp;
     private Rigidbody2D Rigidbody2DComp;
     private bool bGameStart = false;
+    private bool bIsDead = false;
     private bool bIsInAir = false;
     private bool bIsJumpFall = false;
     private bool bIsSlide = false;
@@ -16,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public GameObject SmokePoint;
     public GameObject SmokeEffect;
     public GameObject StarHitEffect;
+    public GameObject FruitHitEffect;
     public Transform TriggerIsInAir;
     public LayerMask GroundMask;
     public BoxCollider2D BoxColliderComp;
@@ -40,9 +42,22 @@ public class PlayerController : MonoBehaviour
         JumpOff();
     }
 
+    public void Dead()
+    {
+        if (!bIsDead)
+        {
+            bIsDead = true;
+            AnimatorComp.SetTrigger("DieTrigger");
+            BoxColliderComp.enabled = false;
+            CircleColliderComp.enabled = false;
+            Rigidbody2DComp.velocity = Vector2.zero;
+            Rigidbody2DComp.gravityScale = 0.5f;
+        }
+    }
+
     private void FixedUpdate()
     {
-        if (bGameStart)
+        if (bGameStart && !bIsDead)
         {
             transform.Translate(new Vector2(MoveSpeed, .0f));
 
@@ -96,6 +111,13 @@ public class PlayerController : MonoBehaviour
             //Debug.Log("Hit Star");
             Instantiate(StarHitEffect, gameObject.transform);
             
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Fruit"))
+        {
+            GameManager.Instance.Hearts++;
+            Instantiate(FruitHitEffect, gameObject.transform);
             Destroy(other.gameObject);
         }
     }
